@@ -14,7 +14,7 @@ TextLayer *text_battery_layer;
 TextLayer *text_time_layer;
 TextLayer *text_monthname_layer;
 TextLayer *text_dateday_layer;
-TextLayer *text_dateseperator_layer;
+// TextLayer *text_dateseperator_layer;
 TextLayer *text_datemonth_layer;
 TextLayer *text_quarter_layer;
 TextLayer *text_week_layer;
@@ -24,7 +24,7 @@ GColor foregroundColor;
 
 Layer *line_layer_1;
 Layer *line_layer_2;
-Layer *line_layer_3;
+Layer *skew_line_layer;
 bool btState = false;
 bool invertedState = false;
 bool isCharging = false;
@@ -41,15 +41,25 @@ static const char *month_names[] = {
 
 void set_default_colors();
 
+// DRAWING FUNCTIONS
+
 void line_layer_update_callback(Layer *layer, GContext* ctx) {
   GColor color1 = foregroundColor;
   if (invertedState) {
     color1 = backgroundColor;
   }
-
   graphics_context_set_fill_color(ctx, color1);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
+
+static void skewline_layer_update_callback(Layer *layer, GContext *ctx) {
+  GPoint p0 = GPoint(0, 0);
+  GPoint p1 = GPoint(144, 144);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_draw_line(ctx, p0, p1);
+}
+
+
 
 void update_bt_mark() {
 	static char bluetooth_text[] = "×";
@@ -70,7 +80,7 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   static char quarter_text[64] ;
   static char monthname_text[4];
   static char dateday_text[6];
-  static char dateseperator_text[4];// "/"
+//  static char dateseperator_text[4];// "/"
   static char datemonth_text[4];
   static int lastDay = 0;
 
@@ -81,7 +91,7 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   int day_padding = (month+1 < 10 ? 2 : 0) + (day < 10 ? 3 : 2);
   snprintf(monthname_text, sizeof(monthname_text), "%s", month_names[month]);
   snprintf(dateday_text, sizeof(dateday_text), "%*d", day_padding, day);
-  snprintf(dateseperator_text, sizeof(dateseperator_text), "%*s", seperator_padding, "/");
+//  snprintf(dateseperator_text, sizeof(dateseperator_text), "%*s", seperator_padding, "/");
   snprintf(datemonth_text, sizeof(datemonth_text), "%*d", month_padding, month + 1);
  
 	int quarter = (month/3) + 1;
@@ -94,8 +104,8 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	  strcpy(day_text, day_names[dayofweek]);
 	  text_layer_set_text(text_day_layer, day_text);
  	  text_layer_set_text(text_monthname_layer, monthname_text);
-	  text_layer_set_text(text_dateday_layer, dateday_text);
-    text_layer_set_text(text_dateseperator_layer, dateseperator_text);
+    text_layer_set_text(text_dateday_layer, dateday_text);
+//    text_layer_set_text(text_dateseperator_layer, dateseperator_text);
 	  text_layer_set_text(text_datemonth_layer, datemonth_text);
     snprintf(quarter_text, sizeof(quarter_text), "Q%d", quarter); //check for buf. overrun?
 	  text_layer_set_text(text_quarter_layer, quarter_text);
@@ -215,8 +225,8 @@ void set_default_colors() {
   text_layer_set_background_color(text_monthname_layer, color2);
   text_layer_set_text_color(text_dateday_layer, color1);
   text_layer_set_background_color(text_dateday_layer, color2);
-  text_layer_set_text_color(text_dateseperator_layer, color1);
-  text_layer_set_background_color(text_dateseperator_layer, color2);
+  // text_layer_set_text_color(text_dateseperator_layer, color1);
+  // text_layer_set_background_color(text_dateseperator_layer, color2);
   text_layer_set_text_color(text_datemonth_layer, color1);
   text_layer_set_background_color(text_datemonth_layer, color2);
   text_layer_set_text_color(text_quarter_layer, color1);
@@ -235,17 +245,7 @@ void set_default_colors() {
 
   layer_mark_dirty(line_layer_1);
   layer_mark_dirty(line_layer_2);
-  layer_mark_dirty(line_layer_3);
-}
-
-
-
-// DRAW SKEW LINE
-static void point_layer_update_callback(Layer *layer, GContext *ctx) {
-  GPoint p0 = GPoint(0, 0);
-  GPoint p1 = GPoint(144, 144);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_line(ctx, p0, p1);
+  layer_mark_dirty(skew_line_layer);
 }
 
 
@@ -337,10 +337,10 @@ void handle_init(void) {
 
   // line three (date seperator)
   GRect line_frame_three = GRect(96, 95, 35, 40);
-  line_layer_3 = layer_create(line_frame_three);
-  layer_set_update_proc(line_layer_3, line_layer_update_callback);
-  layer_add_child(window_layer, line_layer_3); 
-  
+  skew_line_layer = layer_create(line_frame_three);
+  layer_set_update_proc(skew_line_layer, skewline_layer_update_callback);
+  layer_add_child(window_layer, skew_line_layer); 
+
   set_default_colors();
 	
 	// Avoid blank display on launch
@@ -364,14 +364,14 @@ void handle_deinit(void) {
 
   layer_destroy(line_layer_1);
   layer_destroy(line_layer_2);
-  layer_destroy(line_layer_3);
+  layer_destroy(skew_line_layer);
   text_layer_destroy(text_day_layer);
   text_layer_destroy(text_bluetooth_layer);
   text_layer_destroy(text_battery_layer);
   text_layer_destroy(text_time_layer);
   text_layer_destroy(text_monthname_layer);
   text_layer_destroy(text_dateday_layer);
-  text_layer_destroy(text_dateseperator_layer);
+//  text_layer_destroy(text_dateseperator_layer);
   text_layer_destroy(text_datemonth_layer);
   text_layer_destroy(text_quarter_layer);
   text_layer_destroy(text_week_layer);
@@ -384,5 +384,3 @@ int main(void) {
   app_event_loop();
   handle_deinit();
 }
-
-// Test

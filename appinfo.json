@@ -9,9 +9,15 @@
     "resources": {
         "media": [
             {
-                "characterRegex": "[0-9 a-z A-Z]",
-                "file": "fonts/Roboto-Condensed.ttf",
-                "name": "FONTNORMAL_33",
+                "file": "images/ICON_28x28.png",
+                "menuIcon": true,
+                "name": "ICON_28x28",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9:]",
+                "file": "fonts/Roboto-Bold.ttf",
+                "name": "FONTBOLD_54",
                 "type": "font"
             },
             {
@@ -21,10 +27,16 @@
                 "type": "font"
             },
             {
-                "file": "images/ICON_28x28.png",
-                "menuIcon": true,
-                "name": "ICON_28x28",
-                "type": "png"
+                "characterRegex": "[0-9\u00d7/%\\\\ ]",
+                "file": "fonts/Roboto-Condensed.ttf",
+                "name": "FONTNORMAL_31",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9 a-z A-Z]",
+                "file": "fonts/Roboto-Condensed.ttf",
+                "name": "FONTNORMAL_33",
+                "type": "font"
             }
         ]
     },
