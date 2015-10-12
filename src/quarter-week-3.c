@@ -384,3 +384,5 @@ int main(void) {
   app_event_loop();
   handle_deinit();
 }
+
+// Test
