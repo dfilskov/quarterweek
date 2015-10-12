@@ -53,9 +53,13 @@ void line_layer_update_callback(Layer *layer, GContext* ctx) {
 }
 
 static void skewline_layer_update_callback(Layer *layer, GContext *ctx) {
-  GPoint p0 = GPoint(0, 0);
-  GPoint p1 = GPoint(30, 30);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
+  GColor color1 = foregroundColor;
+  if (invertedState) {
+    color1 = backgroundColor;
+  }
+  GPoint p0 = GPoint(0, 25);
+  GPoint p1 = GPoint(8, 0);
+  graphics_context_set_stroke_color(ctx, color1);
   graphics_draw_line(ctx, p0, p1);
 }
 
@@ -336,7 +340,7 @@ void handle_init(void) {
   layer_add_child(window_layer, line_layer_2);	
 
   // line three (date seperator)
-  GRect line_frame_three = GRect(96, 95, 35, 40);
+  GRect line_frame_three = GRect(96, 103, 35, 40);
   skew_line_layer = layer_create(line_frame_three);
   layer_set_update_proc(skew_line_layer, skewline_layer_update_callback);
   layer_add_child(window_layer, skew_line_layer); 
