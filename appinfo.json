@@ -1,0 +1,54 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "Abildgard",
+    "longName": "Quarter Week",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/ICON_28x28.png",
+                "menuIcon": true,
+                "name": "ICON_28x28",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9:]",
+                "file": "fonts/Roboto-Bold.ttf",
+                "name": "FONTBOLD_54",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9]",
+                "file": "fonts/Roboto-Bold.ttf",
+                "name": "FONTBOLD_33",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9\u00d7/%\\\\ ]",
+                "file": "fonts/Roboto-Condensed.ttf",
+                "name": "FONTNORMAL_31",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9 a-z A-Z]",
+                "file": "fonts/Roboto-Condensed.ttf",
+                "name": "FONTNORMAL_33",
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "Quarter Week",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "70b3bbde-abe7-4ee0-96ec-5450fd37ceeb",
+    "versionLabel": "2.4",
+    "watchapp": {
+        "watchface": true
+    }
+}
