@@ -54,7 +54,7 @@ void line_layer_update_callback(Layer *layer, GContext* ctx) {
 
 static void skewline_layer_update_callback(Layer *layer, GContext *ctx) {
   GPoint p0 = GPoint(0, 0);
-  GPoint p1 = GPoint(144, 144);
+  GPoint p1 = GPoint(30, 30);
   graphics_context_set_stroke_color(ctx, GColorBlack);
   graphics_draw_line(ctx, p0, p1);
 }
@@ -384,6 +384,3 @@ int main(void) {
   app_event_loop();
   handle_deinit();
 }
-
-
-// TEST!!
