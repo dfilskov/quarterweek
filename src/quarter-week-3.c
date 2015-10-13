@@ -21,10 +21,14 @@ TextLayer *text_week_layer;
 
 GColor backgroundColor;
 GColor foregroundColor;
+GColor themeColor1;
+GColor themeColor2;
 
 Layer *line_layer_1;
 Layer *line_layer_2;
 Layer *skew_line_layer;
+Layer *top_section_layer;
+Layer *bottom_section_layer;
 bool btState = false;
 bool invertedState = false;
 bool isCharging = false;
@@ -41,6 +45,7 @@ static const char *month_names[] = {
 
 void set_default_colors();
 
+
 // DRAWING FUNCTIONS
 
 void line_layer_update_callback(Layer *layer, GContext* ctx) {
@@ -49,6 +54,15 @@ void line_layer_update_callback(Layer *layer, GContext* ctx) {
     color1 = backgroundColor;
   }
   graphics_context_set_fill_color(ctx, color1);
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
+}
+
+void section_update_callback(Layer *layer, GContext* ctx) {
+  GColor color3 = themeColor1;
+  if (invertedState) {
+    color3 = themeColor2;
+  }
+  graphics_context_set_fill_color(ctx, color3);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
 
@@ -91,7 +105,7 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   int day = tick_time->tm_mday;
   int month = tick_time->tm_mon;
   int month_padding = month+1 < 10 ? 3 : 2;
-  int seperator_padding = month+1 < 10 ? 3 : 1;
+//  int seperator_padding = month+1 < 10 ? 3 : 1;
   int day_padding = (month+1 < 10 ? 2 : 0) + (day < 10 ? 3 : 2);
   snprintf(monthname_text, sizeof(monthname_text), "%s", month_names[month]);
   snprintf(dateday_text, sizeof(dateday_text), "%*d", day_padding, day);
@@ -210,33 +224,35 @@ static void battery_handler(BatteryChargeState charge_state) {
 void set_default_colors() {
   GColor color1 = foregroundColor;
   GColor color2 = backgroundColor;
+  GColor color3 = themeColor1;
   if (invertedState) {
     color1 = backgroundColor;
     color2 = foregroundColor;
+    color3 = themeColor2;
   }
   
   window_set_background_color(window, color2);
 
   text_layer_set_text_color(text_day_layer, color1);
-  text_layer_set_background_color(text_day_layer, color2);
+  text_layer_set_background_color(text_day_layer, color3);
   text_layer_set_text_color(text_bluetooth_layer, color1);
-  text_layer_set_background_color(text_bluetooth_layer, color2);
-  text_layer_set_text_color(text_battery_layer, color1);
-  text_layer_set_background_color(text_battery_layer, color2);
+  text_layer_set_background_color(text_bluetooth_layer, color3);
+//  text_layer_set_text_color(text_battery_layer, color1);
+//  text_layer_set_background_color(text_battery_layer, color3);
   text_layer_set_text_color(text_time_layer, color1);
   text_layer_set_background_color(text_time_layer, color2);
   text_layer_set_text_color(text_monthname_layer, color1);
-  text_layer_set_background_color(text_monthname_layer, color2);
+  text_layer_set_background_color(text_monthname_layer, color3);
   text_layer_set_text_color(text_dateday_layer, color1);
-  text_layer_set_background_color(text_dateday_layer, color2);
+  text_layer_set_background_color(text_dateday_layer, color3);
   // text_layer_set_text_color(text_dateseperator_layer, color1);
-  // text_layer_set_background_color(text_dateseperator_layer, color2);
+  // text_layer_set_background_color(text_dateseperator_layer, color3);
   text_layer_set_text_color(text_datemonth_layer, color1);
-  text_layer_set_background_color(text_datemonth_layer, color2);
+  text_layer_set_background_color(text_datemonth_layer, color3);
   text_layer_set_text_color(text_quarter_layer, color1);
-  text_layer_set_background_color(text_quarter_layer, color2);
+  text_layer_set_background_color(text_quarter_layer, color3);
   text_layer_set_text_color(text_week_layer, color1);
-  text_layer_set_background_color(text_week_layer, color2);
+  text_layer_set_background_color(text_week_layer, color3);
 
   if (isCharging) {
     text_layer_set_text_color(text_battery_layer, color2);
@@ -244,12 +260,14 @@ void set_default_colors() {
   }
   else {
     text_layer_set_text_color(text_battery_layer, color1);
-    text_layer_set_background_color(text_battery_layer, color2);
+    text_layer_set_background_color(text_battery_layer, color3);
   }
 
   layer_mark_dirty(line_layer_1);
   layer_mark_dirty(line_layer_2);
   layer_mark_dirty(skew_line_layer);
+  layer_mark_dirty(top_section_layer);
+  layer_mark_dirty(bottom_section_layer);
 }
 
 
@@ -259,11 +277,15 @@ void set_default_colors() {
 void handle_init(void) {
 
 #ifdef GColorFromRGB
-  backgroundColor = GColorFromHEX(0x000000);
-  foregroundColor = GColorFromHEX(0xFFFFFF);
+  backgroundColor = GColorFromHEX(0xffffff);
+  foregroundColor = GColorFromHEX(0x000000);
+  themeColor1 = GColorFromHEX(0xb8b8ff);
+  themeColor2 = GColorFromHEX(0x000048);
 #else
   backgroundColor = GColorWhite;
   foregroundColor = GColorBlack;
+  themeColor1 = backgroundColor;
+  themeColor2 = backgroundColor;
 #endif
 
   window = window_create();
@@ -276,7 +298,23 @@ void handle_init(void) {
      invertedState = persist_read_bool(PERSIST_INVERTED_STATE_KEY);
    }
  
+  // time
+  text_time_layer = text_layer_create(GRect(2, 32, 144, 60));
+  text_layer_set_font(text_time_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTBOLD_54)));
+  layer_add_child(window_layer, text_layer_get_layer(text_time_layer));
 
+  // top section colored
+  GRect top_frame = GRect(0, 0, 144, 38);
+  top_section_layer = layer_create(top_frame);
+  layer_set_update_proc(top_section_layer, section_update_callback);
+  layer_add_child(window_layer, top_section_layer);
+
+  // bottom section colored
+  GRect bottom_frame = GRect(0, 95, 144, 73);
+  bottom_section_layer = layer_create(bottom_frame);
+  layer_set_update_proc(bottom_section_layer, section_update_callback);
+  layer_add_child(window_layer, bottom_section_layer);
+  
   // weekday
   text_day_layer = text_layer_create(GRect(4, -3, 70, 40));
   text_layer_set_font(text_day_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
@@ -292,11 +330,6 @@ void handle_init(void) {
   text_layer_set_font(text_battery_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_31)));
   layer_add_child(window_layer, text_layer_get_layer(text_battery_layer));
 	
-  // time
-  text_time_layer = text_layer_create(GRect(2, 32, 144, 60));
-  text_layer_set_font(text_time_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTBOLD_54)));
-  layer_add_child(window_layer, text_layer_get_layer(text_time_layer));
-
   // month-name
   text_monthname_layer = text_layer_create(GRect(4, 95, 75, 44));
   text_layer_set_font(text_monthname_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
@@ -327,7 +360,7 @@ void handle_init(void) {
   text_layer_set_font(text_week_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
   layer_add_child(window_layer, text_layer_get_layer(text_week_layer));
 
-	// line one
+  // line one
   GRect line_frame_one = GRect(0, 38, 144, 1);
   line_layer_1 = layer_create(line_frame_one);
   layer_set_update_proc(line_layer_1, line_layer_update_callback);
@@ -369,6 +402,8 @@ void handle_deinit(void) {
   layer_destroy(line_layer_1);
   layer_destroy(line_layer_2);
   layer_destroy(skew_line_layer);
+  layer_destroy(top_section_layer);
+  layer_destroy(bottom_section_layer);
   text_layer_destroy(text_day_layer);
   text_layer_destroy(text_bluetooth_layer);
   text_layer_destroy(text_battery_layer);
