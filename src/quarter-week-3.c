@@ -14,7 +14,6 @@ TextLayer *text_battery_layer;
 TextLayer *text_time_layer;
 TextLayer *text_monthname_layer;
 TextLayer *text_dateday_layer;
-// TextLayer *text_dateseperator_layer;
 TextLayer *text_datemonth_layer;
 TextLayer *text_quarter_layer;
 TextLayer *text_week_layer;
@@ -98,18 +97,15 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   static char quarter_text[64] ;
   static char monthname_text[4];
   static char dateday_text[6];
-//  static char dateseperator_text[4];// "/"
   static char datemonth_text[4];
   static int lastDay = 0;
 
   int day = tick_time->tm_mday;
   int month = tick_time->tm_mon;
   int month_padding = month+1 < 10 ? 3 : 2;
-//  int seperator_padding = month+1 < 10 ? 3 : 1;
   int day_padding = (month+1 < 10 ? 2 : 0) + (day < 10 ? 3 : 2);
   snprintf(monthname_text, sizeof(monthname_text), "%s", month_names[month]);
   snprintf(dateday_text, sizeof(dateday_text), "%*d", day_padding, day);
-//  snprintf(dateseperator_text, sizeof(dateseperator_text), "%*s", seperator_padding, "/");
   snprintf(datemonth_text, sizeof(datemonth_text), "%*d", month_padding, month + 1);
  
 	int quarter = (month/3) + 1;
@@ -123,7 +119,6 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	  text_layer_set_text(text_day_layer, day_text);
  	  text_layer_set_text(text_monthname_layer, monthname_text);
     text_layer_set_text(text_dateday_layer, dateday_text);
-//    text_layer_set_text(text_dateseperator_layer, dateseperator_text);
 	  text_layer_set_text(text_datemonth_layer, datemonth_text);
     snprintf(quarter_text, sizeof(quarter_text), "Q%d", quarter); //check for buf. overrun?
 	  text_layer_set_text(text_quarter_layer, quarter_text);
@@ -237,16 +232,12 @@ void set_default_colors() {
   text_layer_set_background_color(text_day_layer, color3);
   text_layer_set_text_color(text_bluetooth_layer, color1);
   text_layer_set_background_color(text_bluetooth_layer, color3);
-//  text_layer_set_text_color(text_battery_layer, color1);
-//  text_layer_set_background_color(text_battery_layer, color3);
   text_layer_set_text_color(text_time_layer, color1);
   text_layer_set_background_color(text_time_layer, color2);
   text_layer_set_text_color(text_monthname_layer, color1);
   text_layer_set_background_color(text_monthname_layer, color3);
   text_layer_set_text_color(text_dateday_layer, color1);
   text_layer_set_background_color(text_dateday_layer, color3);
-  // text_layer_set_text_color(text_dateseperator_layer, color1);
-  // text_layer_set_background_color(text_dateseperator_layer, color3);
   text_layer_set_text_color(text_datemonth_layer, color1);
   text_layer_set_background_color(text_datemonth_layer, color3);
   text_layer_set_text_color(text_quarter_layer, color1);
@@ -339,11 +330,6 @@ void handle_init(void) {
   text_dateday_layer = text_layer_create(GRect(56, 95, 60, 42));
   text_layer_set_font(text_dateday_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTBOLD_33)));
   layer_add_child(window_layer, text_layer_get_layer(text_dateday_layer));
-
-  // date seperator
-//  text_dateseperator_layer = text_layer_create(GRect(96, 95, 35, 40));
-//  text_layer_set_font(text_dateseperator_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_31)));
-//  layer_add_child(window_layer, text_layer_get_layer(text_dateseperator_layer));
   
   // date month
   text_datemonth_layer = text_layer_create(GRect(106, 95, 90, 42));
@@ -410,7 +396,6 @@ void handle_deinit(void) {
   text_layer_destroy(text_time_layer);
   text_layer_destroy(text_monthname_layer);
   text_layer_destroy(text_dateday_layer);
-//  text_layer_destroy(text_dateseperator_layer);
   text_layer_destroy(text_datemonth_layer);
   text_layer_destroy(text_quarter_layer);
   text_layer_destroy(text_week_layer);
