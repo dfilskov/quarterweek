@@ -14,12 +14,12 @@
     <h2>QuarterWeek configuration</h2>
     <form>
       <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+        <label for="allowChangeInvertOnStartup">Allow change invert on startup</label>
+        <input type="checkbox" class="form-control" id="allowChangeInvertOnStartup">
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        <label for="someOtherControl">Some other control</label>
+        <input class="form-control" id="someOtherControl" placeholder="Write something here">
       </div>
       <button id="submitButton" type="submit" class="btn btn-default">Submit</button>
       <button id="closeButton" class="btn btn-default">Close</button>
@@ -32,19 +32,20 @@
       location.href = 'pebblejs://close';
     });
 
+    var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
     var submitButton = document.getElementById('submitButton');
     submitButton.addEventListener('click', function() {
     
       // Some example configuration values
       var config = {
-        'animSetting': true,
-        'tickSetting': 'seconds',
-        'bgColor': 'red'
+        'allowChangeInvertOnStartup': allowChangeInvertOnStartupInput.checked,
       };
   
       // Return data to watchapp
+      var config = JSON.stringify(config);
+      console.log("Sending data: " + config);
       location.href = 'pebblejs://close#' + 
-      encodeURIComponent(JSON.stringify(config));
+      encodeURIComponent(config);
     });
   });
   </script>
