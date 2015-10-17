@@ -16,10 +16,14 @@ TextLayer *text_monthname_layer;
 TextLayer *text_dateday_layer;
 TextLayer *text_datemonth_layer;
 TextLayer *text_quarter_layer;
+TextLayer *text_q_layer;
 TextLayer *text_week_layer;
+TextLayer *text_w_layer;
 
 GColor backgroundColor;
 GColor foregroundColor;
+GColor dimmColor1;
+GColor dimmColor2;
 GColor themeColor1;
 GColor themeColor2;
 
@@ -93,8 +97,8 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 // Need to be static because they're used by the system later.
   static char time_text[6];
   static char day_text[4];
-  static char week_text[64] ;
   static char quarter_text[64] ;
+  static char week_text[64] ;
   static char monthname_text[4];
   static char dateday_text[6];
   static char datemonth_text[4];
@@ -120,12 +124,12 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
  	  text_layer_set_text(text_monthname_layer, monthname_text);
     text_layer_set_text(text_dateday_layer, dateday_text);
 	  text_layer_set_text(text_datemonth_layer, datemonth_text);
-    snprintf(quarter_text, sizeof(quarter_text), "Q%d", quarter); //check for buf. overrun?
+    snprintf(quarter_text, sizeof(quarter_text), "%d", quarter); //check for buf. overrun?
 	  text_layer_set_text(text_quarter_layer, quarter_text);
 
 	  char temp[64];
    	strftime(temp, sizeof(temp), "%V", tick_time);
-    snprintf(week_text, sizeof(week_text), "W%s", temp); //check for buf. overrun?
+    snprintf(week_text, sizeof(week_text), "%s", temp); //check for buf. overrun?
 	  text_layer_set_text(text_week_layer, week_text);
     
     update_bt_mark();
@@ -220,10 +224,12 @@ void set_default_colors() {
   GColor color1 = foregroundColor;
   GColor color2 = backgroundColor;
   GColor color3 = themeColor1;
+  GColor color4 = dimmColor1;
   if (invertedState) {
     color1 = backgroundColor;
     color2 = foregroundColor;
     color3 = themeColor2;
+    color4 = dimmColor2;
   }
   
   window_set_background_color(window, color2);
@@ -244,6 +250,10 @@ void set_default_colors() {
   text_layer_set_background_color(text_quarter_layer, color3);
   text_layer_set_text_color(text_week_layer, color1);
   text_layer_set_background_color(text_week_layer, color3);
+  text_layer_set_text_color(text_q_layer, color4);
+  text_layer_set_background_color(text_q_layer, color3);
+  text_layer_set_text_color(text_w_layer, color4);
+  text_layer_set_background_color(text_w_layer, color3);
 
   if (isCharging) {
     text_layer_set_text_color(text_battery_layer, color2);
@@ -270,13 +280,17 @@ void handle_init(void) {
 #ifdef GColorFromRGB
   backgroundColor = GColorFromHEX(0xffffff);
   foregroundColor = GColorFromHEX(0x000000);
-  themeColor1 = GColorFromHEX(0xb8b8ff);
+  dimmColor1 = GColorFromHEX(0x606080);
+  dimmColor2 = GColorFromHEX(0x606080);
+  themeColor1 = GColorFromHEX(0xbfbfff);
   themeColor2 = GColorFromHEX(0x000048);
 #else
   backgroundColor = GColorWhite;
   foregroundColor = GColorBlack;
+  dimmColor1 = foregroundColor;
+  dimmColor2 = backgroundColor;
   themeColor1 = backgroundColor;
-  themeColor2 = backgroundColor;
+  themeColor2 = foregroundColor;
 #endif
 
   window = window_create();
@@ -336,13 +350,27 @@ void handle_init(void) {
   text_layer_set_font(text_datemonth_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
   layer_add_child(window_layer, text_layer_get_layer(text_datemonth_layer));
 
-	// quarter
-  text_quarter_layer = text_layer_create(GRect(4, 128, 40, 40));
+	// quarter Q
+  static char q_text[] = "Q";
+  text_q_layer = text_layer_create(GRect(4, 128, 20, 40));
+  text_layer_set_font(text_q_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
+  text_layer_set_text(text_q_layer, q_text);
+  layer_add_child(window_layer, text_layer_get_layer(text_q_layer));
+
+  // quarter no
+  text_quarter_layer = text_layer_create(GRect(25, 128, 25, 40));
   text_layer_set_font(text_quarter_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
   layer_add_child(window_layer, text_layer_get_layer(text_quarter_layer));
 
+  // week W
+  static char w_text[] = "W";
+  text_w_layer = text_layer_create(GRect(80, 128, 30, 40));
+  text_layer_set_font(text_w_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
+  text_layer_set_text(text_w_layer, w_text);
+  layer_add_child(window_layer, text_layer_get_layer(text_w_layer));
+
   // week no
-  text_week_layer = text_layer_create(GRect(81, 128, 60, 40));
+  text_week_layer = text_layer_create(GRect(105, 128, 60, 40));
   text_layer_set_font(text_week_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONTNORMAL_33)));
   layer_add_child(window_layer, text_layer_get_layer(text_week_layer));
 
@@ -363,7 +391,7 @@ void handle_init(void) {
   skew_line_layer = layer_create(line_frame_three);
   layer_set_update_proc(skew_line_layer, skewline_layer_update_callback);
   layer_add_child(window_layer, skew_line_layer); 
-
+  
   set_default_colors();
 	
 	// Avoid blank display on launch
@@ -398,7 +426,9 @@ void handle_deinit(void) {
   text_layer_destroy(text_dateday_layer);
   text_layer_destroy(text_datemonth_layer);
   text_layer_destroy(text_quarter_layer);
+  text_layer_destroy(text_q_layer);
   text_layer_destroy(text_week_layer);
+  text_layer_destroy(text_w_layer);
 
   window_destroy(window);
 }
