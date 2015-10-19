@@ -30,6 +30,8 @@
   $(function() {
     var submitButton = document.getElementById('submitButton');
     var closeButton = document.getElementById('closeButton');
+    var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
+    var someOtherControl = document.getElementById('someOtherControl');
     var returnTo = 'pebblejs://close';
     $('#closeButton').click(function(event) {
       event.preventDefault();
@@ -38,14 +40,16 @@
     });
     $('#submitButton').click(function(event) {
       event.preventDefault();
-      var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
-      var someOtherControl = document.getElementById('someOtherControl');
       var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
       var json = JSON.stringify(settings);
       console.log('submitting: ' + json);
       document.location = returnTo + '#' + encodeURIComponent(json);
     });
-
+    
+    // Read default values
+    var hash = window.location.hash;
+    var config = decodeURIComponent(hash);
+    allowChangeInvertOnStartupInput.checked = config.allowChangeInvertOnStartupInput;
   });
   </script>
 </body>
