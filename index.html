@@ -48,7 +48,8 @@
     
     // Read default values
     var hash = window.location.hash;
-    var config = decodeURIComponent(hash);
+    var config = JSON.parse(decodeURIComponent(hash));
+    console.log(JSON.stringify(config));
     allowChangeInvertOnStartupInput.checked = config.allowChangeInvertOnStartupInput;
   });
   </script>
