@@ -2,9 +2,15 @@
 #include <time.h>
 #include <stdio.h>
 
-#define PERSIST_INVERTED_STATE_KEY 1
-
+// Hardcoded ptions
 #define OPTION_ONLY_VIBRATE_ON_BT_OFF false
+
+// Settings keys
+#define PERSIST_INVERTED_STATE_KEY 1
+#define PERSIST_CHANGE_INVERT_ON_STARTUP_KEY 2
+
+// Config keys
+#define KEY_CHANGE_INVERT_ON_STARTUP 1
 
 Window *window;
 
@@ -151,13 +157,8 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   text_layer_set_text(text_time_layer, time_text);
 }
 
-int countdownStart;
 
-void resetCountdown() {
-  time_t now = time(NULL);
-  struct tm *tm_struct = localtime(&now);
-  countdownStart = tm_struct->tm_sec;
-}
+// BLUETOOTH ------------
 
 void bt_handler(bool connected) {
   if (btState != connected) {
@@ -169,6 +170,24 @@ void bt_handler(bool connected) {
 
   btState = connected;
   update_bt_mark();
+}
+
+
+// COUNTDOWN ------------
+
+int countdownStart;
+
+void resetCountdown() {
+  time_t now = time(NULL);
+  struct tm *tm_struct = localtime(&now);
+  countdownStart = tm_struct->tm_sec;
+}
+
+void afterCountDown() {
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+  btState =  bluetooth_connection_service_peek();
+  bt_handler(btState);
+  bluetooth_connection_service_subscribe(bt_handler);
 }
 
 void handle_invert_countdown(struct tm *tick_time, TimeUnits units_changed) {
@@ -184,10 +203,7 @@ void handle_invert_countdown(struct tm *tick_time, TimeUnits units_changed) {
   
   if ((second + 60 - countdownStart) % 60 >= 4) {
     accel_tap_service_unsubscribe();
-    tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-    btState =  bluetooth_connection_service_peek();
-    bt_handler(btState);
-    bluetooth_connection_service_subscribe(bt_handler);
+    afterCountDown();
   }
 }
 
@@ -203,7 +219,7 @@ static void tap_handler(AccelAxisType axis, int32_t direction) {
 
 
 
-// BATTERY
+// BATTERY ------------
 
 static void battery_handler(BatteryChargeState charge_state) {
   isCharging = charge_state.is_charging;
@@ -272,6 +288,33 @@ void set_default_colors() {
 }
 
 
+// CONFIG ------------
+
+static void inbox_received_handler(DictionaryIterator *iterator, void *context) {
+  // Read first item
+  Tuple *t = dict_read_first(iterator);
+
+  // For all items
+  while(t != NULL) {
+    // Which key was received?
+    switch(t->key) {
+    case KEY_CHANGE_INVERT_ON_STARTUP:
+      persist_write_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY, t->value->int8 == 1);
+      APP_LOG(APP_LOG_LEVEL_INFO, "KEY_CHANGE_INVERT_ON_STARTUP %d", (int)t->value->int8);
+      break;
+    default:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
+      break;
+    }
+
+    // Look for next item
+    t = dict_read_next(iterator);
+  }
+}
+
+static void inbox_dropped_callback(AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
+}
 
 // INIT ------------
 
@@ -299,9 +342,9 @@ void handle_init(void) {
   Layer *window_layer = window_get_root_layer(window);
   
   // Read settings
-   if (persist_exists(PERSIST_INVERTED_STATE_KEY)) {
-     invertedState = persist_read_bool(PERSIST_INVERTED_STATE_KEY);
-   }
+  if (persist_exists(PERSIST_INVERTED_STATE_KEY)) {
+    invertedState = persist_read_bool(PERSIST_INVERTED_STATE_KEY);
+  }
  
   // time
   text_time_layer = text_layer_create(GRect(2, 32, 144, 60));
@@ -400,11 +443,25 @@ void handle_init(void) {
   handle_minute_tick(tm_struct, (TimeUnits) NULL);
   resetCountdown();
 
-  tick_timer_service_subscribe(SECOND_UNIT, handle_invert_countdown);
-
+  // Battery handler
   battery_state_service_subscribe(battery_handler);
   battery_handler(battery_state_service_peek());
-  accel_tap_service_subscribe(tap_handler);
+
+  // Perform countdown?
+  if (persist_exists(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY) && persist_read_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY)) {
+    tick_timer_service_subscribe(SECOND_UNIT, handle_invert_countdown);
+    accel_tap_service_subscribe(tap_handler);
+  }
+  else {
+    afterCountDown();
+  }
+  
+  // AppMessage registration
+  app_message_register_inbox_received(inbox_received_handler);
+  app_message_register_inbox_dropped(inbox_dropped_callback);
+  
+  // Open AppMessage
+  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 }
 
 

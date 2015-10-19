@@ -1,7 +1,9 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "KEY_CHANGE_INVERT_ON_STARTUP": 1
+    },
     "capabilities": [
-        ""
+        "configurable"
     ],
     "companyName": "Abildgard",
     "longName": "Quarter Week",
