@@ -15,15 +15,9 @@
                 "type": "png"
             },
             {
-                "characterRegex": "[0-9:]",
-                "file": "fonts/Roboto-Bold.ttf",
-                "name": "FONTBOLD_54",
-                "type": "font"
-            },
-            {
-                "characterRegex": "[0-9]",
-                "file": "fonts/Roboto-Bold.ttf",
-                "name": "FONTBOLD_33",
+                "characterRegex": "[0-9 a-z A-Z]",
+                "file": "fonts/Roboto-Condensed.ttf",
+                "name": "FONTNORMAL_33",
                 "type": "font"
             },
             {
@@ -33,9 +27,15 @@
                 "type": "font"
             },
             {
-                "characterRegex": "[0-9 a-z A-Z]",
-                "file": "fonts/Roboto-Condensed.ttf",
-                "name": "FONTNORMAL_33",
+                "characterRegex": "[0-9]",
+                "file": "fonts/Roboto-Bold.ttf",
+                "name": "FONTBOLD_33",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9:]",
+                "file": "fonts/Roboto-Bold.ttf",
+                "name": "FONTBOLD_54",
                 "type": "font"
             }
         ]
