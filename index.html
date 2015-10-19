@@ -29,10 +29,18 @@
   <script>
   $(function() {
     var closeButton = document.getElementById('submitButton');
+    var returnTo = 'pebblejs://close';
     closeButton.addEventListener('click', function() {
-      location.href = 'pebblejs://close';
+      console.log('closing');
+      document.location = = returnTo;
     });
-
+    submitButton.addEventListener('click', function() {
+      var settings = { changeInvertOnStartup : true };
+      var json = JSON.stringify(settings);
+      console.log('submitting: ' + json);
+      document.location = returnTo + '#' + encodeURIComponent(json);
+    });
+    
     var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
     var submitButton = document.getElementById('submitButton');
     submitButton.addEventListener('click', function() {
