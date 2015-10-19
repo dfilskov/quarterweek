@@ -31,18 +31,18 @@
     var submitButton = document.getElementById('submitButton');
     var closeButton = document.getElementById('closeButton');
     var returnTo = 'pebblejs://close';
-    closeButton.onClick = function() {
-      console.log('closing');
+    $('#closeButton').click(function() {
+      console.log('closing ' + returnTo);
       document.location = returnTo;
-    };
-    submitButton.onClick = function() {
+    });
+    $('#submitButton').click(function() {
       var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
       var someOtherControl = document.getElementById('someOtherControl');
       var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
       var json = JSON.stringify(settings);
       console.log('submitting: ' + json);
       document.location = returnTo + '#' + encodeURIComponent(json);
-    };
+    });
 
   });
   </script>
