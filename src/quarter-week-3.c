@@ -10,6 +10,7 @@
 #define PERSIST_CHANGE_INVERT_ON_STARTUP_KEY 2
 
 // Config keys
+#define KEY_REQUEST_CONFIG 0
 #define KEY_CHANGE_INVERT_ON_STARTUP 1
 
 Window *window;
@@ -290,6 +291,19 @@ void set_default_colors() {
 
 // CONFIG ------------
 
+void pushConfig() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  
+  // Add a key-value pair
+  if (persist_exists(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY)) {
+    dict_write_uint8(iter, KEY_CHANGE_INVERT_ON_STARTUP, persist_read_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY) ? 1 : 0);
+  }
+  
+  // Send the message!
+  app_message_outbox_send();
+}
+
 static void inbox_received_handler(DictionaryIterator *iterator, void *context) {
   // Read first item
   Tuple *t = dict_read_first(iterator);
@@ -298,9 +312,12 @@ static void inbox_received_handler(DictionaryIterator *iterator, void *context) 
   while(t != NULL) {
     // Which key was received?
     switch(t->key) {
+    case KEY_REQUEST_CONFIG:
+      pushConfig();
+      break;
     case KEY_CHANGE_INVERT_ON_STARTUP:
-      persist_write_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY, t->value->int8 == 1);
-      APP_LOG(APP_LOG_LEVEL_INFO, "KEY_CHANGE_INVERT_ON_STARTUP %d", (int)t->value->int8);
+      persist_write_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY, t->value->uint8 == 1);
+      APP_LOG(APP_LOG_LEVEL_INFO, "KEY_CHANGE_INVERT_ON_STARTUP %d", (int)t->value->uint8);
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
@@ -315,6 +332,15 @@ static void inbox_received_handler(DictionaryIterator *iterator, void *context) 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
 }
+
+static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+}
+
+static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+}
+
 
 // INIT ------------
 
@@ -459,9 +485,14 @@ void handle_init(void) {
   // AppMessage registration
   app_message_register_inbox_received(inbox_received_handler);
   app_message_register_inbox_dropped(inbox_dropped_callback);
-  
+  app_message_register_outbox_failed(outbox_failed_callback);
+  app_message_register_outbox_sent(outbox_sent_callback);
+
   // Open AppMessage
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+  
+  // Push config to javascript
+  //pushConfig();
 }
 
 
