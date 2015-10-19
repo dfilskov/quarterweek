@@ -31,11 +31,13 @@
     var submitButton = document.getElementById('submitButton');
     var closeButton = document.getElementById('closeButton');
     var returnTo = 'pebblejs://close';
-    $('#closeButton').click(function() {
+    $('#closeButton').click(function(event) {
+      event.preventDefault();
       console.log('closing ' + returnTo);
       document.location = returnTo;
     });
-    $('#submitButton').click(function() {
+    $('#submitButton').click(function(event) {
+      event.preventDefault();
       var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
       var someOtherControl = document.getElementById('someOtherControl');
       var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
