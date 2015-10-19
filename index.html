@@ -22,8 +22,8 @@
         <label for="someOtherControl">Some other control</label>
         <input class="form-control" id="someOtherControl" placeholder="Write something here">
       </div>
-      <button id="submitButton" class="btn btn-default">Save</button>
-      <button id="closeButton" class="btn btn-default">Close</button>
+      <input type="button" id="submitButton" class="btn btn-default">Save</button>
+      <input type="button" id="closeButton" class="btn btn-default">Close</button>
     </form>
   </div>
   <a href="#" onClick="javascript:document.location='pebblejs://close'">KLIK HER</a>
@@ -32,11 +32,11 @@
     var submitButton = document.getElementById('submitButton');
     var closeButton = document.getElementById('closeButton');
     var returnTo = 'pebblejs://close';
-    closeButton.addEventListener('click', function() {
+    closeButton.onClick = function() {
       console.log('closing');
       document.location = returnTo;
-    });
-    submitButton.addEventListener('click', function() {
+    };
+    submitButton.onClick = function() {
       var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
       var someOtherControl = document.getElementById('someOtherControl');
       var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
