@@ -22,40 +22,28 @@
         <label for="someOtherControl">Some other control</label>
         <input class="form-control" id="someOtherControl" placeholder="Write something here">
       </div>
-      <button id="submitButton" type="submit" class="btn btn-default">Submit</button>
+      <button id="submitButton" class="btn btn-default">Submit</button>
       <button id="closeButton" class="btn btn-default">Close</button>
     </form>
   </div>
   <script>
   $(function() {
-    var closeButton = document.getElementById('submitButton');
+    var submitButton = document.getElementById('submitButton');
+    var closeButton = document.getElementById('closeButton');
     var returnTo = 'pebblejs://close';
     closeButton.addEventListener('click', function() {
       console.log('closing');
       document.location = = returnTo;
     });
     submitButton.addEventListener('click', function() {
-      var settings = { changeInvertOnStartup : true };
+      var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
+      var someOtherControl = document.getElementById('someOtherControl');
+      var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
       var json = JSON.stringify(settings);
       console.log('submitting: ' + json);
       document.location = returnTo + '#' + encodeURIComponent(json);
     });
-    
-    var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
-    var submitButton = document.getElementById('submitButton');
-    submitButton.addEventListener('click', function() {
-    
-      // Some example configuration values
-      var config = {
-        'allowChangeInvertOnStartup': allowChangeInvertOnStartupInput.checked,
-      };
-  
-      // Return data to watchapp
-      var config = JSON.stringify(config);
-      console.log("Sending data: " + config);
-      location.href = 'pebblejs://close#' + 
-      encodeURIComponent(config);
-    });
+
   });
   </script>
 </body>
