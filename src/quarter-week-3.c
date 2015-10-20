@@ -113,8 +113,8 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   static char datemonth_text[4];
   static int lastDay = 0;
 
-  int day = 20;//tick_time->tm_mday;
-  int month = 11;//tick_time->tm_mon;
+  int day = tick_time->tm_mday;
+  int month = tick_time->tm_mon;
   int day_padding = /*(month+1 < 10 ? 2 : 0) +*/ (day < 10 ? 3 : 2);
   int month_padding = month+1 < 10 ? 3 : 2;
   snprintf(monthname_text, sizeof(monthname_text), "%s", month_names[month]);
