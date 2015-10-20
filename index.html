@@ -15,13 +15,18 @@
     <form>
       <div class="checkbox">
         <label>
+          <input type="checkbox" id="showInverted"> Show inverted
+        </label>
+      </div>
+      <div class="checkbox">
+        <label>
           <input type="checkbox" id="allowChangeInvertOnStartup"> Allow change invert on startup
         </label>
       </div>
-      <div class="form-group">
-        <label for="someOtherControl">Some other control</label>
-        <input class="form-control" id="someOtherControl" placeholder="Write something here">
-      </div>
+      <!--<div class="form-group">-->
+        <!--<label for="someOtherControl">Some other control</label>-->
+        <!--<input class="form-control" id="someOtherControl" placeholder="Write something here">-->
+      <!--</div>-->
       <button id="submitButton" class="btn btn-default">Save</button>
       <button id="closeButton" class="btn btn-default">Close</button>
     </form>
@@ -30,17 +35,21 @@
   $(function() {
     var submitButton = document.getElementById('submitButton');
     var closeButton = document.getElementById('closeButton');
+    var showInvertedInput = document.getElementById('showInverted');
     var allowChangeInvertOnStartupInput = document.getElementById('allowChangeInvertOnStartup');
-    var someOtherControl = document.getElementById('someOtherControl');
+    //var someOtherControl = document.getElementById('someOtherControl');
     var returnTo = 'pebblejs://close';
+
     $('#closeButton').click(function(event) {
       event.preventDefault();
       console.log('closing ' + returnTo);
       document.location = returnTo;
     });
+
     $('#submitButton').click(function(event) {
       event.preventDefault();
-      var settings = { allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked, someOtherControl: someOtherControl.value };
+      // someOtherControl: someOtherControl.value
+      var settings = { showInverted : showInvertedInput.checked, allowChangeInvertOnStartup : allowChangeInvertOnStartupInput.checked  };
       var json = JSON.stringify(settings);
       console.log('submitting: ' + json);
       document.location = returnTo + '#' + encodeURIComponent(json);
@@ -51,6 +60,7 @@
     var config = JSON.parse(decodeURIComponent(hash));
     console.log(JSON.stringify(config));
     allowChangeInvertOnStartupInput.checked = config.allowChangeInvertOnStartup;
+    showInvertedInput.checked = config.showInverted;
   });
   </script>
 </body>
