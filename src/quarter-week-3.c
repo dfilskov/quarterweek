@@ -4,6 +4,7 @@
 
 // Hardcoded ptions
 #define OPTION_ONLY_VIBRATE_ON_BT_OFF false
+#define OPTION_VIBRATE_WHEN_CHANGING_COLORS false
 
 // Settings keys
 #define PERSIST_INVERTED_STATE_KEY 1
@@ -111,10 +112,10 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   static char datemonth_text[4];
   static int lastDay = 0;
 
-  int day = tick_time->tm_mday;
-  int month = tick_time->tm_mon;
+  int day = 20;//tick_time->tm_mday;
+  int month = 11;//tick_time->tm_mon;
+  int day_padding = /*(month+1 < 10 ? 2 : 0) +*/ (day < 10 ? 3 : 2);
   int month_padding = month+1 < 10 ? 3 : 2;
-  int day_padding = (month+1 < 10 ? 2 : 0) + (day < 10 ? 3 : 2);
   snprintf(monthname_text, sizeof(monthname_text), "%s", month_names[month]);
   snprintf(dateday_text, sizeof(dateday_text), "%*d", day_padding, day);
   snprintf(datemonth_text, sizeof(datemonth_text), "%*d", month_padding, month + 1);
@@ -212,7 +213,10 @@ static void tap_handler(AccelAxisType axis, int32_t direction) {
   invertedState = !invertedState;
   persist_write_bool(PERSIST_INVERTED_STATE_KEY, invertedState);
   set_default_colors();
-  vibes_short_pulse();
+  if (OPTION_VIBRATE_WHEN_CHANGING_COLORS) 
+  {
+    vibes_short_pulse();
+  }
 
   // Reset countdown
   resetCountdown();
