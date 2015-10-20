@@ -1,1 +1,51 @@
-| blabla | betyder en dropdown. (  ) betyder en option |_| betyder checkmark # er de vigtige funktioner synes jeg :) -------------- Design#     (  ) Light background        (  ) Dark background        |_| Dimm everything but the time        Color screens only        (  ) Background partly grey        (  ) Background partly blue        (  ) Background partly green        (  ) Background partly orange        (  ) Background partly red        (  ) Background partly turquoise        |_| Hide Q and W - show only the digits.        (  ) Default date format - e.g. "Oct 16 / 10"        (  ) Hide month number - e.g. "Oct 16"        (  ) Hide month name - e.g. "16 / 10"        Battery        (  ) Show percentage - e.g. 50%        (  ) Show icon emptying/filling up - e.g  |||||||    |# Shake at startup| does nothing | - eller inverts display (eller cycle colors - andre?)During night-time period#     from | 24:00 | to | 06:00 |  | daily| - eller weekdays eller weekends#     |_| change to black background #     |_| turn off bluetooth        (  ) default        (  ) turn on motion enabled light        (  ) turn off motion enabled light-------------- 
+| blabla | betyder en dropdown.
+(  ) betyder en option
+|_| betyder checkmark
+
+# er de vigtige funktioner synes jeg :)
+
+
+--------------
+
+Design
+
+#	(  ) Light background
+	(  ) Dark background
+
+	|_| Dimm everything but the time
+
+	Color screens only
+	(  ) Background partly grey
+	(  ) Background partly blue
+	(  ) Background partly green
+	(  ) Background partly orange
+	(  ) Background partly red
+	(  ) Background partly turquoise
+
+	|_| Hide Q and W - show only the digits.
+
+	(  ) Default date format - e.g. "Oct 16 / 10"
+	(  ) Hide month number - e.g. "Oct 16"
+	(  ) Hide month name - e.g. "16 / 10"
+
+
+	Battery
+	(  ) Show percentage - e.g. 50%
+	(  ) Show icon emptying/filling up - e.g  |||||||    |
+
+
+# Shake at startup | does nothing | - eller inverts display (eller cycle colors - andre?)
+
+
+During night-time period
+
+#	from | 24:00 | to | 06:00 |  | daily | - eller weekdays eller weekends
+
+#	|_| change to black background
+#	|_| turn off bluetooth
+
+	(  ) default
+	(  ) turn on motion enabled light
+	(  ) turn off motion enabled light
+
+--------------
