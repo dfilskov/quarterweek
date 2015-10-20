@@ -1,7 +1,8 @@
 {
     "appKeys": {
         "KEY_CHANGE_INVERT_ON_STARTUP": 1,
-        "KEY_REQUEST_CONFIG": 0
+        "KEY_REQUEST_CONFIG": 0,
+        "KEY_SHOW_INVERTED": 2
     },
     "capabilities": [
         "configurable"

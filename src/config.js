@@ -23,7 +23,8 @@ Pebble.addEventListener('webviewclosed', function(e) {
     
   // Prepare AppMessage payload
   var dict = {
-    'KEY_CHANGE_INVERT_ON_STARTUP': configData.allowChangeInvertOnStartup ? 1 : 0
+    'KEY_CHANGE_INVERT_ON_STARTUP': configData.allowChangeInvertOnStartup ? 1 : 0,
+    'KEY_SHOW_INVERTED': configData.showInverted ? 1 : 0,
   };
 
   // Send settings to Pebble app
@@ -35,12 +36,12 @@ Pebble.addEventListener('webviewclosed', function(e) {
 });
 
 Pebble.addEventListener('appmessage', function(e) {
-  //console.log('AppMessage received: ' + JSON.stringify(e));
   console.log('AppMessage received: ' + JSON.stringify(e));
 
   // Read config settings sent from the Pebble app on startup
   var configData = {
-    allowChangeInvertOnStartup: e.payload.KEY_CHANGE_INVERT_ON_STARTUP == 1
+    allowChangeInvertOnStartup: e.payload.KEY_CHANGE_INVERT_ON_STARTUP == 1,
+    showInverted: e.payload.KEY_SHOW_INVERTED == 1
   };
   
   console.log('Opening config window');

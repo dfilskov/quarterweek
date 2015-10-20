@@ -13,6 +13,7 @@
 // Config keys
 #define KEY_REQUEST_CONFIG 0
 #define KEY_CHANGE_INVERT_ON_STARTUP 1
+#define KEY_SHOW_INVERTED 2
 
 Window *window;
 
@@ -303,6 +304,9 @@ void pushConfig() {
   if (persist_exists(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY)) {
     dict_write_uint8(iter, KEY_CHANGE_INVERT_ON_STARTUP, persist_read_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY) ? 1 : 0);
   }
+  if (persist_exists(PERSIST_INVERTED_STATE_KEY)) {
+    dict_write_uint8(iter, KEY_SHOW_INVERTED, persist_read_bool(PERSIST_INVERTED_STATE_KEY) ? 1 : 0);
+  }
   
   // Send the message!
   app_message_outbox_send();
@@ -322,6 +326,12 @@ static void inbox_received_handler(DictionaryIterator *iterator, void *context) 
     case KEY_CHANGE_INVERT_ON_STARTUP:
       persist_write_bool(PERSIST_CHANGE_INVERT_ON_STARTUP_KEY, t->value->uint8 == 1);
       APP_LOG(APP_LOG_LEVEL_INFO, "KEY_CHANGE_INVERT_ON_STARTUP %d", (int)t->value->uint8);
+      break;
+    case KEY_SHOW_INVERTED:
+      invertedState = t->value->uint8 == 1;
+      set_default_colors();
+      persist_write_bool(PERSIST_INVERTED_STATE_KEY, invertedState);
+      APP_LOG(APP_LOG_LEVEL_INFO, "KEY_SHOW_INVERTED %d", (int)t->value->uint8);
       break;
     default:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
