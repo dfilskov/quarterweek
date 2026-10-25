@@ -1,0 +1,18 @@
+grep BUILD_ID /etc/os-release
+
+F=$(dirname $(ls /sys/class/hwmon/hwmon*/pwm1 | head -1)); echo $F; cat $F/name $F/pwm1 $F/pwm1_enable $F/fan1_input
+for z in /sys/class/thermal/thermal_zone*; do echo "$(cat $z/type) $(cat $z/temp) $(cat $z/mode)"; done | head -12
+
+Z=$(grep -l cpu0 /sys/class/thermal/thermal_zone*/type | head -1 | xargs dirname); for t in $Z/trip_point_*_temp; do echo "$t $(cat $t) $(cat ${t%_temp}_type) $(cat ${t%_temp}_hyst)"; done
+for c in /sys/class/thermal/cooling_device*; do [ "$(cat $c/type)" = pwm-fan ] && echo "fan state $(cat $c/cur_state)/$(cat $c/max_state)"; done
+journalctl -b | grep -i fancontrol | tail -5
+
+
+
+
+Then test the fan directly (a reboot puts it back to normal):
+
+
+echo 255 > $F/pwm1; sleep 3; cat $F/fan1_input
+echo 128 > $F/pwm1; sleep 3; cat $F/fan1_input
+echo 80 > $F/pwm1; sleep 3; cat $F/fan1_input
